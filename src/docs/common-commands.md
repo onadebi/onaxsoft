@@ -12,3 +12,8 @@ To delete a controller and its associated files, you can use the nest g controll
 ```shell
 nest g controller gemname --dry-run
 ```
+
+xml2js package to convert JavaScript objects to XML
+```shell
+npm install xml2js
+```
