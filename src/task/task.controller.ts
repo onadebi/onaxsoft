@@ -4,14 +4,18 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Put,
+  Query,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Task } from './Task.model';
-import { TaskCreationDto } from './dto/TaskCreation.dto';
-import { TaskUpdateDto } from './dto/TaskUpdate.dto';
+import {
+  TasksFilterDto,
+  TaskUpdateDto,
+  TaskCreationDto,
+} from './dto/index.dto';
 
 @ApiTags('Tasks')
 @Controller('api/task')
@@ -25,8 +29,13 @@ export class TaskController {
     description: 'List of all tasks',
     type: [Task],
   })
-  getTasks(): Task[] {
-    return this.taskService.getAllTasks();
+  getTasks(@Query() filterDto: TasksFilterDto): Task[] {
+    if (Object.keys(filterDto).length) {
+      //add filter logic here in the future
+      return [];
+    } else {
+      return this.taskService.getAllTasks();
+    }
   }
 
   @Get('/status-types')
@@ -68,7 +77,7 @@ export class TaskController {
     return newTask;
   }
 
-  @Put('/:id')
+  @Patch('/:id/status')
   @ApiOperation({ summary: 'Update a task by ID' })
   @ApiResponse({
     status: 200,
@@ -80,9 +89,13 @@ export class TaskController {
     type: TaskUpdateDto,
     description: 'Task object that needs to be updated',
   })
-  updateTask(@Body() updateTaskDto: TaskUpdateDto): Task | undefined {
-    const newTask = this.taskService.updateTask(updateTaskDto);
-    return newTask;
+  updateTask(
+    @Param('id') id: string,
+    @Body('updateTaskDto') updateTaskDto: TaskUpdateDto,
+  ): Task | undefined {
+    updateTaskDto.id = id;
+    const taskUpdate = this.taskService.updateTask(updateTaskDto);
+    return taskUpdate;
   }
 
   @Delete('/:id')
