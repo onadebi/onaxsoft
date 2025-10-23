@@ -2,12 +2,15 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import setupSwagger from './modules/swagger.module';
 import appsettings from './configs/appsettings';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   setupSwagger(app);
-  const PORT = appsettings.env === 'development' ? appsettings.port : 0;
-  await app.listen(PORT); // Port 0 means let the OS assign an available port
+  const PORT = appsettings.env === 'development' ? appsettings.port : 0; // Port 0 means let the OS assign an available port
+
+  app.useGlobalPipes(new ValidationPipe());
+  await app.listen(PORT);
   return app;
 }
 

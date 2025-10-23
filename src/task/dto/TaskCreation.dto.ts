@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
 
 export enum TaskStatus {
   OPEN = 'OPEN',
@@ -11,6 +12,7 @@ export class TaskCreationDto {
     description: 'The title of the task',
     example: 'Complete project documentation',
   })
+  @IsNotEmpty({ message: 'Title must not be empty' })
   title: string;
 
   @ApiProperty({

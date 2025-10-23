@@ -91,7 +91,7 @@ export class TaskController {
   })
   updateTask(
     @Param('id') id: string,
-    @Body('updateTaskDto') updateTaskDto: TaskUpdateDto,
+    @Body() updateTaskDto: TaskUpdateDto,
   ): Task | undefined {
     updateTaskDto.id = id;
     const taskUpdate = this.taskService.updateTask(updateTaskDto);
