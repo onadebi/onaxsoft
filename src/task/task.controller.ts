@@ -16,6 +16,7 @@ import {
   TaskUpdateDto,
   TaskCreationDto,
 } from './dto/index.dto';
+import GenResponse from 'src/common/GenResponse';
 
 @ApiTags('Tasks')
 @Controller('api/task')
@@ -27,12 +28,11 @@ export class TaskController {
   @ApiResponse({
     status: 200,
     description: 'List of all tasks',
-    type: [Task],
+    type: Promise<GenResponse<Task[]>>,
   })
-  getTasks(@Query() filterDto: TasksFilterDto): Task[] {
+  getTasks(@Query() filterDto: TasksFilterDto): Promise<GenResponse<Task[]>> {
     if (Object.keys(filterDto).length) {
-      //add filter logic here in the future
-      return [];
+      return this.taskService.getFilteredTasks(filterDto);
     } else {
       return this.taskService.getAllTasks();
     }
@@ -52,27 +52,25 @@ export class TaskController {
   @Get('/:id')
   @ApiOperation({ summary: 'Get a task by ID' })
   @ApiResponse({
-    status: 200,
+    status: 200 | 404,
     description: 'The task with the specified ID',
-    type: Task,
+    type: Promise<GenResponse<Task>>,
   })
-  getTaskById(@Param('id') id: string): Task | undefined {
+  getTaskById(@Param('id') id: string): Promise<GenResponse<Task>> {
     return this.taskService.getTaskById(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create a new task' })
-  @ApiResponse({
-    status: 200,
-    description: 'Task created successfully',
-    type: Task,
-  })
+  @ApiResponse({ type: GenResponse<Task> })
   @ApiResponse({ status: 501, description: 'Task creation failed' })
   @ApiBody({
     type: TaskCreationDto,
     description: 'Task object that needs to be created',
   })
-  createTask(@Body() createTaskDto: TaskCreationDto): Task {
+  createTask(
+    @Body() createTaskDto: TaskCreationDto,
+  ): Promise<GenResponse<Task>> {
     const newTask = this.taskService.createTask(createTaskDto);
     return newTask;
   }

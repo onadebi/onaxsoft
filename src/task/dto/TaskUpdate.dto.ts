@@ -1,5 +1,6 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { TaskCreationDto, TaskStatus } from './TaskCreation.dto';
+import { IsEnum } from 'class-validator';
 
 // Create a partial base DTO class using NestJS PartialType
 const PartialTaskCreationDto = PartialType(TaskCreationDto);
@@ -19,6 +20,9 @@ export class TaskUpdateDto extends PartialTaskCreationDto {
     description: 'The current status of the task',
     enum: TaskStatus,
     example: TaskStatus.OPEN,
+  })
+  @IsEnum(TaskStatus, {
+    message: 'Status must be a valid TaskStatus enum value',
   })
   status: TaskStatus;
 

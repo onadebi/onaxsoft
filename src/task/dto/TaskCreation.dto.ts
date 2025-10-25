@@ -20,5 +20,5 @@ export class TaskCreationDto {
     required: false,
     example: 'Write comprehensive documentation for the API endpoints',
   })
-  description?: string;
+  description?: string | null;
 }

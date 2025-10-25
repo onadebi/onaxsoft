@@ -1,4 +1,12 @@
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { TaskStatus } from './TaskCreation.dto';
+
 export class TasksFilterDto {
+  @IsOptional()
+  @IsString()
   search?: string;
-  status?: string;
+
+  @IsOptional()
+  @IsEnum(TaskStatus)
+  status?: TaskStatus;
 }

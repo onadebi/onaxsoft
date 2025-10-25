@@ -11,3 +11,9 @@ npm i --save-dev @types/node
 ```shell
 npm i class-validator class-transformer
 ```
+
+DB ORM
+```shell
+npm i drizzle-orm pg dotenv
+npm i -D drizzle-kit tsx @types/pg
+```
