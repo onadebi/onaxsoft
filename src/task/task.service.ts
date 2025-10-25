@@ -9,39 +9,18 @@ import GenResponse from 'src/common/GenResponse';
 @Injectable()
 export class TaskService {
   constructor(private readonly taskRepository: TaskRepository) {}
-  private tasks: Task[] = [];
 
   async createTask(taskDto: TaskCreationDto): Promise<GenResponse<Task>> {
     const task = await this.taskRepository.createTask(taskDto);
     return task;
   }
 
-  updateTask(taskUpdate: TaskUpdateDto): Task | undefined {
-    if (taskUpdate == undefined || taskUpdate?.id === undefined) {
-      return undefined;
-    }
-    const task = this.tasks.find((t) => t.id === taskUpdate.id);
-    if (task) {
-      task.status =
-        taskUpdate.status !== undefined && taskUpdate.status !== null
-          ? AppHelpers.validateTaskStatus(taskUpdate.status)
-          : task.status;
-      task.title =
-        taskUpdate.title !== undefined && taskUpdate.title !== null
-          ? taskUpdate.title
-          : task.title;
-      task.description =
-        taskUpdate.description !== undefined && taskUpdate.description !== null
-          ? taskUpdate.description
-          : task.description;
-      Object.assign(task, taskUpdate);
-    }
-    return task;
+  updateTask(taskUpdate: TaskUpdateDto): Promise<GenResponse<Task>> {
+    return this.taskRepository.updateTask(taskUpdate);
   }
 
-  deleteTask(taskId: string): boolean {
-    this.tasks = this.tasks.filter((t) => t.id !== taskId);
-    return this.tasks.find((t) => t.id === taskId) === undefined;
+  deleteTask(taskId: string): Promise<GenResponse<boolean>> {
+    return this.taskRepository.deleteTask(taskId);
   }
 
   async getAllTasks(): Promise<GenResponse<Task[]>> {

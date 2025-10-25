@@ -87,12 +87,12 @@ export class TaskController {
     type: TaskUpdateDto,
     description: 'Task object that needs to be updated',
   })
-  updateTask(
+  async updateTask(
     @Param('id') id: string,
     @Body() updateTaskDto: TaskUpdateDto,
-  ): Task | undefined {
+  ): Promise<GenResponse<Task>> {
     updateTaskDto.id = id;
-    const taskUpdate = this.taskService.updateTask(updateTaskDto);
+    const taskUpdate = await this.taskService.updateTask(updateTaskDto);
     return taskUpdate;
   }
 
@@ -101,10 +101,10 @@ export class TaskController {
   @ApiResponse({
     status: 200,
     description: 'Task deletion',
-    type: Boolean,
+    type: GenResponse<boolean>,
   })
   @ApiResponse({ status: 501, description: 'True | False' })
-  deleteTask(@Param('id') id: string): boolean {
-    return this.taskService.deleteTask(id);
+  async deleteTask(@Param('id') id: string): Promise<GenResponse<boolean>> {
+    return await this.taskService.deleteTask(id);
   }
 }

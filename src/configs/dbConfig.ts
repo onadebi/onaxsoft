@@ -1,5 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import appsettings from './appsettings';
+import { TaskEntity } from 'src/db/schema';
 
 const db = drizzle(appsettings.DB.dbConString, {
   logger: {
@@ -9,6 +10,9 @@ const db = drizzle(appsettings.DB.dbConString, {
         console.log(query);
       }
     },
+  },
+  schema: {
+    TaskEntity,
   },
 });
 

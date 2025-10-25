@@ -6,6 +6,7 @@ import GenResponse, { StatusCode } from 'src/common/GenResponse';
 import { TaskCreationDto } from '../dto/TaskCreation.dto';
 import { Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
+import { TaskUpdateDto } from '../dto/index.dto';
 
 @Injectable()
 export class TaskRepository {
@@ -85,11 +86,106 @@ export class TaskRepository {
     return objResp;
   }
 
-  //   async updateTask(id: string, data: Partial<Task>): Promise<Task | null> {
-  //     // Implementation for updating a task
-  //   }
+  async updateTask(taskUpdate: TaskUpdateDto): Promise<GenResponse<Task>> {
+    if (taskUpdate == undefined || !taskUpdate.id) {
+      return GenResponse.Failed<Task>(
+        {} as Task,
+        'Invalid task update data',
+        '',
+        StatusCode.BadRequest,
+      );
+    }
+    const task = await db
+      .select()
+      .from(TaskEntity)
+      .where(eq(TaskEntity.id, taskUpdate.id))
+      .limit(1)
+      .then((res) => (res.length > 0 ? res[0] : null));
+    if (!task) {
+      return GenResponse.Failed<Task>(
+        {} as Task,
+        'Task not found',
+        '',
+        StatusCode.NotFound,
+      );
+    }
+    const taskFind: GenResponse<Task> = GenResponse.Result({} as Task);
+    const objResp = new Promise<GenResponse<Task>>((resolve) => {
+      if (task) {
+        task.status = AppHelpers.validateTaskStatus(taskUpdate.status);
+        task.title =
+          taskUpdate.title !== undefined && taskUpdate.title !== null
+            ? taskUpdate.title
+            : task.title;
+        task.description =
+          taskUpdate.description !== undefined &&
+          taskUpdate.description !== null
+            ? taskUpdate.description
+            : task.description;
+        db.update(TaskEntity)
+          .set({ ...task })
+          .where(eq(TaskEntity.id, taskUpdate.id))
+          .returning()
+          .then((resp) => {
+            if (resp && resp.length > 0) {
+              taskFind.data = {
+                ...resp[0],
+                status: AppHelpers.validateTaskStatus(resp[0].status),
+              };
+              taskFind.isSuccess = true;
+              taskFind.message = 'Task updated successfully';
+              taskFind.statusCode = StatusCode.OK;
+            } else {
+              taskFind.isSuccess = false;
+              taskFind.message = 'Task update failed';
+              taskFind.statusCode = StatusCode.NotImplemented;
+            }
+            return resolve(taskFind);
+          })
+          .catch((ex) => {
+            console.log(
+              `Error updating task with id: ${taskUpdate.id} :: [${ex}].`,
+            );
+          });
+      }
+    });
+    return objResp;
+  }
 
-  //   async deleteTask(id: string): Promise<boolean> {
-  //     // Implementation for deleting a task
-  //   }
+  async deleteTask(id: string): Promise<GenResponse<boolean>> {
+    let deleteResult: { id: string } | void = { id: '' };
+    try {
+      deleteResult = await db
+        .delete(TaskEntity)
+        .where(eq(TaskEntity.id, id))
+        .returning({
+          id: TaskEntity.id,
+        })
+        .then((res) => (res.length > 0 ? { id: res[0].id } : { id: '' }))
+        .catch((ex) => {
+          console.log(`Error deleting task with id: ${id} :: [${ex}].`);
+        });
+    } catch (ex) {
+      console.log(`Error fetching task with id: ${id} :: [${ex}].`);
+      return GenResponse.Failed<boolean>(
+        false,
+        'server error',
+        null,
+        StatusCode.ServerError,
+      );
+    }
+    const objResp = new Promise<GenResponse<boolean>>((resolve) => {
+      const resp = GenResponse.Result(false, '', StatusCode.NotImplemented);
+      if (deleteResult && deleteResult.id) {
+        resp.isSuccess = resp.data = true;
+        resp.message = 'Task deleted successfully';
+        resp.statusCode = StatusCode.OK;
+        resolve(resp);
+      } else {
+        resp.message = 'Task deletion failed';
+        resolve(resp);
+      }
+    });
+    return objResp;
+  }
 }
