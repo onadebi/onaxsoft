@@ -23,8 +23,8 @@ export class TaskService {
     return this.taskRepository.deleteTask(taskId);
   }
 
-  async getAllTasks(): Promise<GenResponse<Task[]>> {
-    return await this.taskRepository.getAllTasks();
+  async getAllTasks(paging?: TasksFilterDto): Promise<GenResponse<Task[]>> {
+    return await this.taskRepository.getAllTasks(paging);
   }
 
   async getFilteredTasks(

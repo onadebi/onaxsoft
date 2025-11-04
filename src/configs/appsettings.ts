@@ -1,3 +1,4 @@
+import { plainToInstance } from 'class-transformer';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -25,6 +26,17 @@ const appsettings = {
       'postgresql://username:pwd@localhost:5432/onaxappnode',
   },
   jwtSecret: process.env.JWT_SECRET || 'your_jwt_secret',
+  functions: {
+    getObjects: (filterDto: object): Record<string, unknown> => {
+      const resp = Object.keys(filterDto).reduce((acc, key) => {
+        if (key) {
+          acc[key.toLowerCase()] = filterDto[key as keyof object];
+        }
+        return acc;
+      }, {});
+      return resp;
+    },
+  },
 };
 
 export default appsettings;

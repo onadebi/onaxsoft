@@ -7,13 +7,25 @@ import { TaskCreationDto } from '../dto/TaskCreation.dto';
 import { Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { TaskUpdateDto } from '../dto/index.dto';
+import { Pagination } from 'src/common/Pagination.dto';
 
 @Injectable()
 export class TaskRepository {
-  async getAllTasks(): Promise<GenResponse<Task[]>> {
+  async getAllTasks(paging?: Pagination): Promise<GenResponse<Task[]>> {
     const tasks: GenResponse<Task[]> = GenResponse.Result([]);
     // Implementation for retrieving all tasks
-    const result = await db.select().from(TaskEntity);
+    let pagedResult = paging;
+    if (!pagedResult || !pagedResult.page || !pagedResult.pagesize) {
+      pagedResult = new Pagination();
+    }
+    const result = await db
+      .select()
+      .from(TaskEntity)
+      .offset(
+        (pagedResult.page <= 1 ? 0 : pagedResult.page - 1) *
+          pagedResult.pagesize,
+      )
+      .limit(pagedResult.pagesize);
     if (result && result.length > 0) {
       result.map((task) => {
         const taskModel: Task = {
