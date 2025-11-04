@@ -9,7 +9,13 @@ import {
   Query,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Task } from './Task.model';
 import {
   TasksFilterDto,
@@ -17,9 +23,6 @@ import {
   TaskCreationDto,
 } from './dto/index.dto';
 import GenResponse from 'src/common/GenResponse';
-import { CaseInsensitiveQueryPipe } from 'src/modules/pipes/CaseInsensitiveQueryPipe ';
-import { plainToInstance } from 'class-transformer';
-import appsettings from 'src/configs/appsettings';
 
 @ApiTags('Tasks')
 @Controller('api/task')
@@ -33,8 +36,8 @@ export class TaskController {
     description: 'List of all tasks',
     type: Promise<GenResponse<Task[]>>,
   })
-  @ApiQuery({name: 'page',required: false, type: Number})
-  @ApiQuery({name: 'pagesize',type: Number, required: false})
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'pagesize', type: Number, required: false })
   getTasks(@Query() filterDto: TasksFilterDto): Promise<GenResponse<Task[]>> {
     return this.taskService.getAllTasks(filterDto);
   }
