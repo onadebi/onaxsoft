@@ -5,7 +5,7 @@ import { AppHelpers } from 'src/common/apphelpers';
 import GenResponse, { StatusCode } from 'src/common/GenResponse';
 import { TaskCreationDto } from '../dto/TaskCreation.dto';
 import { Injectable } from '@nestjs/common';
-import { eq, or, like, and, SQL } from 'drizzle-orm';
+import { eq, or, ilike, and, SQL } from 'drizzle-orm';
 import { TasksFilterDto, TaskUpdateDto } from '../dto/index.dto';
 import { Pagination } from 'src/common/Pagination.dto';
 
@@ -89,8 +89,8 @@ export class TaskRepository {
       conditions.push(
         AppHelpers.safeSQL(
           or(
-            like(TaskEntity.title, `%${pagedResult.search}%`),
-            like(TaskEntity.description, `%${pagedResult.search}%`),
+            ilike(TaskEntity.title, `%${pagedResult.search}%`),
+            ilike(TaskEntity.description, `%${pagedResult.search}%`),
           ),
         ),
       );
@@ -101,6 +101,7 @@ export class TaskRepository {
 
     // #region Query Script Debug
     const queryScript = query.toSQL();
+    console.log('Generated SQL Query:', queryScript);
     //#endregion
 
     // Execute query
