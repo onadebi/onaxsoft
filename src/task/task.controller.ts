@@ -36,8 +36,10 @@ export class TaskController {
     description: 'List of all tasks',
     type: Promise<GenResponse<Task[]>>,
   })
-  @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pagesize', type: Number, required: false })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'search', type: String, required: false })
+  @ApiQuery({ name: 'status', type: String, required: false })
   getTasks(@Query() filterDto: TasksFilterDto): Promise<GenResponse<Task[]>> {
     return this.taskService.getAllTasks(filterDto);
   }

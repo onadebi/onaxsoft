@@ -5,12 +5,19 @@ import { AppHelpers } from 'src/common/apphelpers';
 import GenResponse, { StatusCode } from 'src/common/GenResponse';
 import { TaskCreationDto } from '../dto/TaskCreation.dto';
 import { Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
-import { TaskUpdateDto } from '../dto/index.dto';
+import { eq, or, like, and, SQL } from 'drizzle-orm';
+import { TasksFilterDto, TaskUpdateDto } from '../dto/index.dto';
 import { Pagination } from 'src/common/Pagination.dto';
 
 @Injectable()
 export class TaskRepository {
+  //#region OBSOLETE
+  /**
+   * Improper filtering after getting all Tasks
+   * @deprecated since version 2.0 - Use getAllTasksWithFilter(paging?: TasksFilterDto) instead
+   * @param {TasksFilterDto} paging - Function argument for filtering tasks
+   * @returns {Promise<GenResponse<Task[]>>} Promise<GenResponse<Task[]>> - The filtered tasks
+   */
   async getAllTasks(paging?: Pagination): Promise<GenResponse<Task[]>> {
     const tasks: GenResponse<Task[]> = GenResponse.Result([]);
     // Implementation for retrieving all tasks
@@ -26,6 +33,78 @@ export class TaskRepository {
           pagedResult.pagesize,
       )
       .limit(pagedResult.pagesize);
+    if (result && result.length > 0) {
+      result.map((task) => {
+        const taskModel: Task = {
+          id: task.id,
+          title: task.title,
+          description: task.description,
+          status: AppHelpers.validateTaskStatus(task.status),
+        };
+        tasks.data?.push(taskModel);
+      });
+    }
+    return tasks.data!.length > 0
+      ? GenResponse.Result(tasks.data!, 'success', StatusCode.OK)
+      : GenResponse.Result<Task[]>([], '', StatusCode.NotFound);
+  }
+  //#endregion
+
+  async getAllTasksWithFilter(
+    paging?: TasksFilterDto,
+  ): Promise<GenResponse<Task[]>> {
+    const tasks: GenResponse<Task[]> = GenResponse.Result([]);
+    // Implementation for retrieving all tasks
+    let pagedResult = paging;
+    if (!pagedResult) {
+      pagedResult = new Pagination();
+    }
+    if (!pagedResult.page || !pagedResult.pagesize) {
+      const defaultPaging = new Pagination();
+      pagedResult.page = defaultPaging.page;
+      pagedResult.pagesize = defaultPaging.pagesize;
+    }
+
+    if (pagedResult.pagesize > new Pagination().pagesize) {
+      pagedResult.pagesize = 250;
+    }
+    let query = db
+      .select()
+      .from(TaskEntity)
+      .$dynamic()
+      .offset(
+        (pagedResult.page <= 1 ? 0 : pagedResult.page - 1) *
+          pagedResult.pagesize,
+      )
+      .limit(pagedResult.pagesize);
+
+    // Build dynamic WHERE conditions
+    const conditions: SQL[] = [];
+
+    if (pagedResult.status) {
+      const validStatus = AppHelpers.validateTaskStatus(pagedResult.status);
+      conditions.push(eq(TaskEntity.status, validStatus));
+    }
+    if (pagedResult.search) {
+      conditions.push(
+        AppHelpers.safeSQL(
+          or(
+            like(TaskEntity.title, `%${pagedResult.search}%`),
+            like(TaskEntity.description, `%${pagedResult.search}%`),
+          ),
+        ),
+      );
+    }
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    // #region Query Script Debug
+    const queryScript = query.toSQL();
+    //#endregion
+
+    // Execute query
+    const result = await query;
     if (result && result.length > 0) {
       result.map((task) => {
         const taskModel: Task = {

@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, Min } from 'class-validator';
+import { IsInt, IsOptional, Min, Max } from 'class-validator';
 
 export class Pagination {
   @IsOptional()
@@ -12,6 +12,7 @@ export class Pagination {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(250)
   pagesize: number;
 
   constructor(page?: number, pagesize?: number) {
