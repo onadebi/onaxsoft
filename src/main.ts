@@ -5,10 +5,13 @@ import appsettings from "./configs/appsettings";
 import { ValidationPipe } from "@nestjs/common";
 import { CaseInsensitiveQueryPipe } from "./modules/pipes/CaseInsensitiveQueryPipe ";
 import { StartUpHealthChecks } from "./helpers/startup";
+import TemplateEngine from "./modules/template-engine";
+import { NestExpressApplication } from "@nestjs/platform-express";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   setupSwagger(app);
+  TemplateEngine(app, "ejs");
   const PORT = appsettings.env === "development" ? appsettings.port : 0; // Port 0 means let the OS assign an available port
 
   app.useGlobalPipes(
