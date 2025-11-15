@@ -1,13 +1,13 @@
-import db from 'src/configs/dbConfig';
-import { TaskEntity } from '../schema/task.entity';
-import { Task } from '../Task.model';
-import { AppHelpers } from 'src/common/apphelpers';
-import GenResponse, { StatusCode } from 'src/common/GenResponse';
-import { TaskCreationDto } from '../dto/TaskCreation.dto';
-import { Injectable } from '@nestjs/common';
-import { eq, or, ilike, and, SQL } from 'drizzle-orm';
-import { TasksFilterDto, TaskUpdateDto } from '../dto/index.dto';
-import { Pagination } from 'src/common/Pagination.dto';
+import db from "src/configs/dbConfig";
+import { TaskEntity } from "../schema/task.entity";
+import { Task } from "../Task.model";
+import { AppHelpers } from "src/common/apphelpers";
+import GenResponse, { StatusCode } from "src/common/GenResponse";
+import { TaskCreationDto } from "../dto/TaskCreation.dto";
+import { Injectable } from "@nestjs/common";
+import { eq, or, ilike, and, SQL } from "drizzle-orm";
+import { TasksFilterDto, TaskUpdateDto } from "../dto/index.dto";
+import { Pagination } from "src/common/Pagination.dto";
 
 @Injectable()
 export class TaskRepository {
@@ -45,8 +45,8 @@ export class TaskRepository {
       });
     }
     return tasks.data!.length > 0
-      ? GenResponse.Result(tasks.data!, 'success', StatusCode.OK)
-      : GenResponse.Result<Task[]>([], '', StatusCode.NotFound);
+      ? GenResponse.Result(tasks.data!, "success", StatusCode.OK)
+      : GenResponse.Result<Task[]>([], "", StatusCode.NotFound);
   }
   //#endregion
 
@@ -101,7 +101,7 @@ export class TaskRepository {
 
     // #region Query Script Debug
     const queryScript = query.toSQL();
-    console.log('Generated SQL Query:', queryScript);
+    console.log("Generated SQL Query:", queryScript);
     //#endregion
 
     // Execute query
@@ -118,8 +118,8 @@ export class TaskRepository {
       });
     }
     return tasks.data!.length > 0
-      ? GenResponse.Result(tasks.data!, 'success', StatusCode.OK)
-      : GenResponse.Result<Task[]>([], '', StatusCode.NotFound);
+      ? GenResponse.Result(tasks.data!, "success", StatusCode.OK)
+      : GenResponse.Result<Task[]>([], "", StatusCode.NotFound);
   }
 
   async createTask(taskDto: TaskCreationDto): Promise<GenResponse<Task>> {
@@ -140,12 +140,12 @@ export class TaskRepository {
         resolve(
           GenResponse.Result(
             createdTask,
-            'Task created successfully.',
+            "Task created successfully.",
             StatusCode.Created,
           ),
         );
       } else {
-        resolve(GenResponse.Failed(createdTask, 'Task creation failed.', ''));
+        resolve(GenResponse.Failed(createdTask, "Task creation failed.", ""));
       }
     });
     return objResp;
@@ -166,11 +166,11 @@ export class TaskRepository {
           status: AppHelpers.validateTaskStatus(task[0].status),
         };
         taskFind.isSuccess = true;
-        taskFind.message = 'Task found';
+        taskFind.message = "Task found";
         taskFind.statusCode = StatusCode.OK;
       } else {
         taskFind.isSuccess = false;
-        taskFind.message = 'Task not found';
+        taskFind.message = "Task not found";
         taskFind.statusCode = StatusCode.NotFound;
       }
       resolve(taskFind);
@@ -182,8 +182,8 @@ export class TaskRepository {
     if (taskUpdate == undefined || !taskUpdate.id) {
       return GenResponse.Failed<Task>(
         {} as Task,
-        'Invalid task update data',
-        '',
+        "Invalid task update data",
+        "",
         StatusCode.BadRequest,
       );
     }
@@ -196,8 +196,8 @@ export class TaskRepository {
     if (!task) {
       return GenResponse.Failed<Task>(
         {} as Task,
-        'Task not found',
-        '',
+        "Task not found",
+        "",
         StatusCode.NotFound,
       );
     }
@@ -225,11 +225,11 @@ export class TaskRepository {
                 status: AppHelpers.validateTaskStatus(resp[0].status),
               };
               taskFind.isSuccess = true;
-              taskFind.message = 'Task updated successfully';
+              taskFind.message = "Task updated successfully";
               taskFind.statusCode = StatusCode.OK;
             } else {
               taskFind.isSuccess = false;
-              taskFind.message = 'Task update failed';
+              taskFind.message = "Task update failed";
               taskFind.statusCode = StatusCode.NotImplemented;
             }
             return resolve(taskFind);
@@ -245,7 +245,7 @@ export class TaskRepository {
   }
 
   async deleteTask(id: string): Promise<GenResponse<boolean>> {
-    let deleteResult: { id: string } | void = { id: '' };
+    let deleteResult: { id: string } | void = { id: "" };
     try {
       deleteResult = await db
         .delete(TaskEntity)
@@ -253,7 +253,7 @@ export class TaskRepository {
         .returning({
           id: TaskEntity.id,
         })
-        .then((res) => (res.length > 0 ? { id: res[0].id } : { id: '' }))
+        .then((res) => (res.length > 0 ? { id: res[0].id } : { id: "" }))
         .catch((ex) => {
           console.log(`Error deleting task with id: ${id} :: [${ex}].`);
         });
@@ -261,20 +261,20 @@ export class TaskRepository {
       console.log(`Error fetching task with id: ${id} :: [${ex}].`);
       return GenResponse.Failed<boolean>(
         false,
-        'server error',
+        "server error",
         null,
         StatusCode.ServerError,
       );
     }
     const objResp = new Promise<GenResponse<boolean>>((resolve) => {
-      const resp = GenResponse.Result(false, '', StatusCode.NotImplemented);
+      const resp = GenResponse.Result(false, "", StatusCode.NotImplemented);
       if (deleteResult && deleteResult.id) {
         resp.isSuccess = resp.data = true;
-        resp.message = 'Task deleted successfully';
+        resp.message = "Task deleted successfully";
         resp.statusCode = StatusCode.OK;
         resolve(resp);
       } else {
-        resp.message = 'Task deletion failed';
+        resp.message = "Task deletion failed";
         resolve(resp);
       }
     });

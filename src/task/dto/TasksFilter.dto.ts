@@ -1,6 +1,6 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { TaskStatus } from './TaskCreation.dto';
-import { Pagination } from 'src/common/Pagination.dto';
+import { IsEnum, IsOptional, IsString } from "class-validator";
+import { TaskStatus } from "./TaskCreation.dto";
+import { Pagination } from "src/common/Pagination.dto";
 
 export class TasksFilterDto extends Pagination {
   @IsOptional()

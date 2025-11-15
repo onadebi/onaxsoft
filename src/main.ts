@@ -1,14 +1,15 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import setupSwagger from './modules/swagger.module';
-import appsettings from './configs/appsettings';
-import { ValidationPipe } from '@nestjs/common';
-import { CaseInsensitiveQueryPipe } from './modules/pipes/CaseInsensitiveQueryPipe ';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import setupSwagger from "./modules/swagger.module";
+import appsettings from "./configs/appsettings";
+import { ValidationPipe } from "@nestjs/common";
+import { CaseInsensitiveQueryPipe } from "./modules/pipes/CaseInsensitiveQueryPipe ";
+import { StartUpHealthChecks } from "./helpers/startup";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   setupSwagger(app);
-  const PORT = appsettings.env === 'development' ? appsettings.port : 0; // Port 0 means let the OS assign an available port
+  const PORT = appsettings.env === "development" ? appsettings.port : 0; // Port 0 means let the OS assign an available port
 
   app.useGlobalPipes(
     new CaseInsensitiveQueryPipe(),
@@ -25,11 +26,12 @@ bootstrap()
   .then(async (app) => {
     try {
       const serverUrl = await app.getUrl();
+      await StartUpHealthChecks.AuthSchemaCheck();
       console.log(`Application is running at: ${serverUrl}`);
     } catch {
-      console.log('Application is running (port assigned by hosting provider)');
+      console.log("Application is running (port assigned by hosting provider)");
     }
   })
   .catch((error) => {
-    console.error('Bootstrap failed', error);
+    console.error("Bootstrap failed", error);
   });

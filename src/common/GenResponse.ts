@@ -7,14 +7,14 @@ class GenResponse<T> {
 
   constructor() {
     this.isSuccess = false;
-    this.message = '';
+    this.message = "";
     this.statusCode = 200;
     this.error = null;
   }
 
   static Result<T>(
     objVal: T,
-    message: string | null = '',
+    message: string | null = "",
     statusCode: StatusCode = StatusCode.OK,
   ): GenResponse<T> {
     const objResp = new GenResponse<T>();

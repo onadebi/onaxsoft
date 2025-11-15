@@ -1,5 +1,5 @@
-import { TaskStatus } from 'src/task/dto/TaskCreation.dto';
-import { SQL, sql } from 'drizzle-orm';
+import { TaskStatus } from "src/task/dto/TaskCreation.dto";
+import { SQL, sql } from "drizzle-orm";
 
 export class AppHelpers {
   public static validateTaskStatus(status: string): TaskStatus {

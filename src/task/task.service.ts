@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { Task } from './Task.model';
-import { TaskCreationDto, TaskStatus } from './dto/TaskCreation.dto';
-import { TasksFilterDto, TaskUpdateDto } from './dto/index.dto';
-import { TaskRepository } from './repository/TaskRepository';
-import GenResponse from 'src/common/GenResponse';
+import { Injectable } from "@nestjs/common";
+import { Task } from "./Task.model";
+import { TaskCreationDto, TaskStatus } from "./dto/TaskCreation.dto";
+import { TasksFilterDto, TaskUpdateDto } from "./dto/index.dto";
+import { TaskRepository } from "./repository/TaskRepository";
+import GenResponse from "src/common/GenResponse";
 
 @Injectable()
 export class TaskService {

@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
 // Explicitly declare process type
@@ -9,7 +9,7 @@ declare const process: {
 };
 
 const appsettings = {
-  env: process.env.ENV || 'development',
+  env: process.env.ENV || "development",
   port: process.env.PORT || 4500,
   DB: {
     username: process.env.DB_user,
@@ -22,9 +22,9 @@ const appsettings = {
 
     dbConString:
       process.env.DB_CONSTRING ||
-      'postgresql://username:pwd@localhost:5432/onaxappnode',
+      "postgresql://username:pwd@localhost:5432/onaxappnode",
   },
-  jwtSecret: process.env.JWT_SECRET || 'your_jwt_secret',
+  jwtSecret: process.env.JWT_SECRET || "your_jwt_secret",
   functions: {
     getObjects: (filterDto: object): Record<string, unknown> => {
       const resp = Object.keys(filterDto).reduce((acc, key) => {
