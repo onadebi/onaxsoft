@@ -13,14 +13,11 @@ const schemaChecks = async () => {
     if (result.rows.length === 0) {
       await db.execute(`CREATE SCHEMA auth`);
       console.log("Schema 'auth' created successfully.");
-    } else {
-      console.error("Schema 'auth' already exists.");
-      process.exit(1); // Exit with error code
     }
 
     console.log("Database connection is valid.");
   } catch (error) {
-    console.error("Database schema check error:", error);
+    console.error("Database connection/schema check error:", error);
     process.exit(1); // Exit with error code on any database error
   }
 };
